@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
 
-from posts.models import Comment, Post, Follow, User
+from posts.models import Comment, Post, Follow, User, Group
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -38,3 +38,11 @@ class FollowSerializer(serializers.ModelSerializer):
         if user == following:
             raise serializers.ValidationError("Нельзя подписаться на самого себя")
         return following
+
+
+class GroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Group
+        ref_name = 'ReadOnlyGroups'

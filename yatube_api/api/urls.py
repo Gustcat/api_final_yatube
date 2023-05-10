@@ -2,13 +2,14 @@ from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
 
-from .views import FollowViewSet
+from .views import FollowViewSet, GroupViewSet
 
 
 router = DefaultRouter()
 
 #router.register('posts', PostViewSet)
 #router.register('comments', CommentViewSet)
+router.register('groups', GroupViewSet)
 router.register('follow', FollowViewSet, basename='follow')
 
 urlpatterns = [
