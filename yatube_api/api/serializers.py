@@ -7,6 +7,9 @@ from posts.models import Comment, Post, Follow, User, Group
 
 class PostSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field='username', read_only=True)
+    image = serializers.ImageField(required=False)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(),
+                                               required=False)
 
     class Meta:
         fields = '__all__'
@@ -17,6 +20,7 @@ class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         fields = '__all__'
@@ -27,7 +31,8 @@ class FollowSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
-    following = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
+    following = serializers.SlugRelatedField(slug_field='username',
+                                             queryset=User.objects.all())
 
     class Meta:
         fields = ('following', 'user')
@@ -36,7 +41,11 @@ class FollowSerializer(serializers.ModelSerializer):
     def validate_following(self, following):
         user = self.context['request'].user
         if user == following:
-            raise serializers.ValidationError("Нельзя подписаться на самого себя")
+            raise serializers.ValidationError('You cannot'
+                                              'subscribe to yourself')
+        if (Follow.objects.filter(user__username=user)
+           .filter(following__username=following)):
+            raise serializers.ValidationError('Subscription already exists')
         return following
 
 
